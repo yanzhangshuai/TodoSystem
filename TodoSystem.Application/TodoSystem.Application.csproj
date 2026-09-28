@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="EntityFrameworkCore.Data.QueryBuilder" Version="10.0.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="11.0.0-rc.1.26425.128" />
+      <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="10.0.12" />
+      <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.23.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\TodoSystem.EntityFrameworkCore\TodoSystem.EntityFrameworkCore.csproj" />
+      <ProjectReference Include="..\TodoSystem.Infrastructure\TodoSystem.Infrastructure.csproj" />
+      <ProjectReference Include="..\TodoSystem.Domain\TodoSystem.Domain.csproj" />
+    </ItemGroup>
+
+</Project>
