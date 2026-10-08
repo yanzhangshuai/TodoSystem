@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using TodoSystem.Domain.Base;
+using TodoSystem.Domain.Constants;
 
 namespace TodoSystem.Domain.Entities;
 
@@ -10,29 +11,27 @@ namespace TodoSystem.Domain.Entities;
 [Table("external_logins")]
 public class ExternalLoginEntity : AppBaseEntity
 {
-    /// <summary>提供商名称，统一小写，如 google。</summary>
+    /// <summary>提供商名称，取值见 <see cref="AuthProviders"/>，统一小写。</summary>
     public string Provider { get; set; } = default!;
 
     /// <summary>
-    /// 提供商侧的用户唯一标识。
-    /// Google 对应 id_token 里的 sub（不可变，改邮箱也不会变），不要用 email 当主键。
+    /// 提供商侧的用户唯一标识。Google 对应 id_token 里的 sub（不可变，改邮箱也不会变），
+    /// 不要用 email 当身份依据。
     /// </summary>
     public string ProviderKey { get; set; } = default!;
 
     public int UserId { get; set; }
 
-    /// <summary>绑定时的邮箱快照，便于排查；不作为身份依据。</summary>
+    /// <summary>绑定时的邮箱快照，便于排查；展示以 users.email 为准。</summary>
     public string? Email { get; set; }
 
     /// <summary>提供商返回的昵称快照。</summary>
     public string? DisplayName { get; set; }
 
+    /// <summary>提供商返回的头像快照，只记录绑定时拿到了什么。</summary>
     public string? AvatarUrl { get; set; }
 
     public DateTimeOffset? LastLoginAt { get; set; }
-
-    /// <summary>提供商返回的原始声明 JSON，保留以便后续扩展（如取 locale）。</summary>
-    public string? RawClaims { get; set; }
 
     public UserEntity? User { get; set; }
 }

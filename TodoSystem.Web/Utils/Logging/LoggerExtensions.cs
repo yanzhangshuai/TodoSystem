@@ -9,7 +9,7 @@ public static class LoggerExtensions
         Log.Logger = new LoggerConfiguration()
             .ReadFrom.Configuration(builder.Configuration)
             .CreateLogger();
-        
+
         builder.Logging.ClearProviders();
         builder.Logging.AddSerilog();
 

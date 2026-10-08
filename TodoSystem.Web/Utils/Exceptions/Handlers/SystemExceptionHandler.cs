@@ -6,7 +6,7 @@ namespace TodoSystem.Web.Utils.Exceptions.Handlers;
 
 public class SystemExceptionHandler(ILogger<CustomException> logger, IWebHostEnvironment environment): IExceptionHandler
 {
-    public async  ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception,
+    public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception,
         CancellationToken cancellationToken)
     {
         if (exception is CustomException) return false;

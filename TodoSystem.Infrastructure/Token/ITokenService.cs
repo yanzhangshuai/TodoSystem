@@ -17,7 +17,8 @@ public interface ITokenService
     RefreshTokenInfo CreateRefreshToken();
 
     /// <summary>
-    /// Refresh Token 明文 → 存储用哈希
+    /// 令牌明文 → 存储用哈希（Base64(SHA-256)）。
+    /// Refresh Token 和邮箱验证令牌共用同一种哈希，所以名字不绑定某一种令牌。
     /// </summary>
-    string HashRefreshToken(string refreshToken);
+    string HashToken(string token);
 }

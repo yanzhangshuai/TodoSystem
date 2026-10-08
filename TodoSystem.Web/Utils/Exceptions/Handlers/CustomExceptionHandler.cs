@@ -7,7 +7,7 @@ namespace TodoSystem.Web.Utils.Exceptions.Handlers;
 public class CustomExceptionHandler(ILogger<CustomException> logger): IExceptionHandler
 {
     /// <summary>
-    /// 异常拦截器 return true 结束， false 到下一个 ExceptionHandler。 找不到就默认UseExceptionHandler处理
+    /// 返回 true 表示已处理并结束；返回 false 交给下一个 handler。
     /// </summary>
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {

@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TodoSystem.Application.Services.Auth;
-using TodoSystem.Application.Services.Student;
+using TodoSystem.Application.Services.Todo;
 using TodoSystem.Domain.Entities;
 using TodoSystem.EntityFrameworkCore;
+using TodoSystem.Infrastructure.Google;
 using TodoSystem.Infrastructure.Token;
 
 namespace TodoSystem.Web.Utils.DependencyInjection;
@@ -22,9 +23,14 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<IPasswordHasher<UserEntity>, PasswordHasher<UserEntity>>();
         services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<IGoogleTokenValidator, GoogleTokenValidator>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IEmailVerificationService, EmailVerificationService>();
         services.AddScoped<ICurrentUser, TodoSystem.Web.Utils.Auth.CurrentUser>();
-        services.AddScoped<IStudentService, StudentService>();
+
+        services.AddScoped<ITodoListService, TodoListService>();
+        services.AddScoped<ITodoItemService, TodoItemService>();
+        services.AddScoped<ITagService, TagService>();
 
         return services;
     }

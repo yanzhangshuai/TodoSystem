@@ -8,4 +8,4 @@ public record LoginResult(
     string AccessToken,
     string RefreshToken,
     int ExpiresIn,
-    DateTime RefreshTokenExpiresAt);
+    DateTimeOffset RefreshTokenExpiresAt);

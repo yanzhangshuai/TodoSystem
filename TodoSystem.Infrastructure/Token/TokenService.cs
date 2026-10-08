@@ -24,6 +24,8 @@ public class TokenService(IOptions<TokenOptions> options) : ITokenService
             key,
             SecurityAlgorithms.HmacSha256);
 
+        // JWT 的 nbf/exp 内部是 Unix 时间戳，不涉及时区歧义，
+        // 这里的 DateTime 不会落库，保持原样即可。
         var now = DateTime.UtcNow;
 
         var expiresAt = now.AddMinutes(
@@ -39,8 +41,8 @@ public class TokenService(IOptions<TokenOptions> options) : ITokenService
                 ClaimTypes.Name,
                 userName),
 
-            new (
-                ClaimTypes.Email, 
+            new(
+                ClaimTypes.Email,
                 email),
             new(
                 ClaimTypes.Role,
@@ -74,7 +76,8 @@ public class TokenService(IOptions<TokenOptions> options) : ITokenService
         var token = Convert.ToBase64String(
             RandomNumberGenerator.GetBytes(32));
 
-        var expiresAt = DateTime.UtcNow.AddDays(
+        // 用 DateTimeOffset.UtcNow：这个值会写进 refresh_tokens.expires_at
+        var expiresAt = DateTimeOffset.UtcNow.AddDays(
             _token.RefreshTokenDays);
 
         return new RefreshTokenInfo(
@@ -82,11 +85,11 @@ public class TokenService(IOptions<TokenOptions> options) : ITokenService
             expiresAt);
     }
 
-    public string HashRefreshToken(
-        string refreshToken)
+    public string HashToken(
+        string token)
     {
         var bytes = SHA256.HashData(
-            Encoding.UTF8.GetBytes(refreshToken));
+            Encoding.UTF8.GetBytes(token));
 
         return Convert.ToBase64String(bytes);
     }

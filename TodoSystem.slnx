@@ -2,6 +2,7 @@
   <Project Path="TodoSystem.Application/TodoSystem.Application.csproj" />
   <Project Path="TodoSystem.Domain\TodoSystem.Domain.csproj" />
   <Project Path="TodoSystem.EntityFrameworkCore/TodoSystem.EntityFrameworkCore.csproj" />
+  <Project Path="TodoSystem.HealthDashboard/TodoSystem.HealthDashboard.csproj" />
   <Project Path="TodoSystem.Infrastructure/TodoSystem.Infrastructure.csproj" />
   <Project Path="TodoSystem.Web\TodoSystem.Web.csproj" />
 </Solution>

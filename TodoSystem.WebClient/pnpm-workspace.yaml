@@ -1,0 +1,4 @@
+# pnpm v11 默认 strictDepBuilds=true：依赖的 postinstall 未经批准会让 install 以非零码退出。
+# esbuild 的 postinstall 负责落位平台二进制，Vite 依赖它，必须放行。
+allowBuilds:
+  esbuild: true

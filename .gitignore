@@ -1,0 +1,44 @@
+# ---- .NET ----
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+[Ll]og/
+[Ll]ogs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+*.dbmdl
+*.jfm
+
+# Rider / IntelliJ
+.idea/
+*.DotSettings.user
+
+# ---- Node / 前端 ----
+node_modules/
+dist/
+dist-ssr/
+.vite/
+*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.eslintcache
+
+# ---- 密钥，禁止提交 ----
+appsettings.*.local.json
+*.pfx
+*.snk
+.env
+.env.*
+!.env.example
+
+# ---- 本地文件邮箱（Email:Provider=File 的落盘目录）----
+emails/
+
+# ---- OS ----
+.DS_Store
+Thumbs.db

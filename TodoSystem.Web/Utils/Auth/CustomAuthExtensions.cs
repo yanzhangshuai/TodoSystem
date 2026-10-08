@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using TodoSystem.Infrastructure.Exceptions;
+using TodoSystem.Infrastructure.Google;
 using TodoSystem.Infrastructure.Token;
 using TodoSystem.Web.Utils.ApiResults;
 
@@ -14,8 +15,13 @@ public static class CustomAuthExtensions
 {
     public static IServiceCollection AddCustomAuth(this IServiceCollection services, IConfiguration configuration)
     {
+        // Google 登录配置（ClientId / ClientSecret）
+        services.Configure<GoogleAuthOptions>(
+            configuration.GetSection(GoogleAuthOptions.SectionName));
+
+        // JWT
         services.Configure<TokenOptions>(configuration.GetSection(TokenOptions.SectionName));
-        
+
         var jwt = configuration.GetSection(TokenOptions.SectionName).Get<TokenOptions>()
                   ?? throw new CustomException(500, "未配置 JWT");
 
@@ -25,6 +31,10 @@ public static class CustomAuthExtensions
         services.AddHttpContextAccessor();
 
         // 默认方案按请求头转发：Bearer → JWT，否则 Cookie
+        //
+        // 注意：Google 登录走的是「前端拿 id_token → POST 到 /api/auth/google」的
+        // ID Token 直传流程，由 IGoogleTokenValidator 验签，不经过这里。
+        // 因此不再注册 Google 的 OIDC 重定向方案。
         services.AddAuthentication(AuthSchemes.BearerOrCookie)
             .AddPolicyScheme(AuthSchemes.BearerOrCookie, "Bearer or Cookie", options =>
             {
@@ -35,18 +45,6 @@ public static class CustomAuthExtensions
                         ? JwtBearerDefaults.AuthenticationScheme
                         : CookieAuthenticationDefaults.AuthenticationScheme;
                 };
-            })
-            
-            // google
-            .AddGoogleOpenIdConnect(options =>
-            {
-                // 从配置文件读取Google的ClientId和ClientSecret
-                options.ClientId = configuration["Authentication:Google:ClientId"];
-                options.ClientSecret = configuration["Authentication:Google:ClientSecret"];
-                // 回调路径要和Google开发者控制台里配置的完全一致
-                options.CallbackPath = "/api/auth/google-callback";
-                // 可选：自定义映射用户信息到Claims
-                // options.ClaimActions.MapJsonKey("urn:google:avatar", "picture", "url");
             })
             .AddJwtBearer(options =>
             {
@@ -89,6 +87,10 @@ public static class CustomAuthExtensions
                 options.LoginPath = "/account/login";
                 options.ExpireTimeSpan = TimeSpan.FromDays(7);
                 options.SlidingExpiration = true;
+
+                // 前后端分离，Cookie 需要跨端口携带
+                options.Cookie.SameSite = SameSiteMode.Lax;
+                options.Cookie.HttpOnly = true;
 
                 // 未登录 401 / 无权限 403，不走重定向（API 友好）
                 options.Events.OnRedirectToLogin = context =>

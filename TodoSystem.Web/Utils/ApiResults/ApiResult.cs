@@ -3,11 +3,11 @@ namespace TodoSystem.Web.Utils.ApiResults;
 public class ApiResult<T>
 {
     public T? Data { get; set; }
-    
+
     public int StatusCode { get; set; }
-    
+
     public int Code { get; set; }
-    
+
     public string? Message { get; set; }
 
 
@@ -24,7 +24,6 @@ public class ApiResult<T>
 
     public static ApiResult<T> Error(int statusCode, int code, string message)
     {
-
         return new ApiResult<T>()
         {
             StatusCode = statusCode,
@@ -33,10 +32,9 @@ public class ApiResult<T>
             Data = default
         };
     }
-    
+
     public static ApiResult<T> Error(int code, string message)
     {
-
         return new ApiResult<T>()
         {
             StatusCode = StatusCodes.Status500InternalServerError,
@@ -60,7 +58,7 @@ public class ApiResult : ApiResult<object>
             Message = ""
         };
     }
-    
+
     public new static ApiResult Fail(int statusCode, int code, string message)
     {
         return new ApiResult

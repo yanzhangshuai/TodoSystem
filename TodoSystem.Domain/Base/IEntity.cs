@@ -9,18 +9,12 @@ public interface IEntity<TKey>
     public TKey Id { get; set; }
 }
 
-/// <summary>
-/// 主键位 int类型的基类
-/// </summary>
+/// <summary>主键为 int 的实体基接口。</summary>
 public interface IEntityInt : IEntity<int>
 {
-    
 }
 
-/// <summary>
-/// 主键位 Guid 类型的基类
-/// </summary>
+/// <summary>主键为 Guid 的实体基接口。</summary>
 public interface IEntityGuid : IEntity<Guid>
 {
-    
 }
