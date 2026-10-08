@@ -1,0 +1,71 @@
+name: todosystem
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-todo_system}
+      POSTGRES_USER: ${POSTGRES_USER:-plotweaver}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
+    volumes:
+      - todosystem_pgdata:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:${DB_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-plotweaver} -d ${POSTGRES_DB:-todo_system}"]
+      interval: 5s
+      retries: 20
+    restart: always
+
+  api:
+    build:
+      context: .
+      dockerfile: TodoSystem.Web/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__PgSql: server=db;port=5432;database=${POSTGRES_DB:-todo_system};userid=${POSTGRES_USER:-plotweaver};password=${POSTGRES_PASSWORD:?}
+      Jwt__SecretKey: ${JWT_SECRET_KEY:?}
+      Authentication__Google__ClientId: ${GOOGLE_CLIENT_ID:-738896916129-sn1k57i38n7u4i7l8006mhi5spmvud16.apps.googleusercontent.com}
+      Email__Provider: ${EMAIL_PROVIDER:-Smtp}
+      Email__FromAddress: ${EMAIL_FROM_ADDRESS:-}
+      Email__WebClientBaseUrl: ${PUBLIC_BASE_URL:-http://localhost:8080}
+      Email__Smtp__Host: ${EMAIL_SMTP_HOST:-}
+      Email__Smtp__Port: ${EMAIL_SMTP_PORT:-587}
+      Email__Smtp__UserName: ${EMAIL_SMTP_USERNAME:-}
+      Email__Smtp__Password: ${EMAIL_SMTP_PASSWORD:-}
+      Seed__Enabled: ${SEED_ENABLED:-false}
+    volumes:
+      - todosystem_emails:/app/emails
+    ports:
+      - "127.0.0.1:15241:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: always
+
+  web:
+    build:
+      context: .
+      dockerfile: TodoSystem.WebClient/Dockerfile
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    depends_on:
+      - api
+    restart: always
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: TodoSystem.HealthDashboard/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      HealthCheckEndpoints__TodoSystem: http://api:8080/healthz
+    ports:
+      - "127.0.0.1:15242:8080"
+    depends_on:
+      - api
+    restart: always
+
+volumes:
+  todosystem_pgdata:
+  todosystem_emails:

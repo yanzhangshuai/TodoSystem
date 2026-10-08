@@ -13,8 +13,9 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddDependencyInjection(this IServiceCollection services, IConfiguration configuration)
     {
-        var dbConnectionString = configuration.GetConnectionString("PgSql")
-                                 ?? throw new InvalidOperationException("未配置数据库连接字符串");
+        // 不再校验连接串是否为空：Program.cs 开头的 ValidateRequiredConfiguration()
+        // 已经统一拦过。这里只负责把它接到 DbContext 上。
+        var dbConnectionString = configuration.GetConnectionString("PgSql")!;
 
         services.AddDbContext<TodoSystemDbContext>(options =>
         {

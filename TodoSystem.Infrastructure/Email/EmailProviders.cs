@@ -6,6 +6,6 @@ public static class EmailProviders
     /// <summary>写到本地目录，开发用。</summary>
     public const string File = "File";
 
-    /// <summary>真实 SMTP 投递。</summary>
+    /// <summary>真实 SMTP 发送。</summary>
     public const string Smtp = "Smtp";
 }

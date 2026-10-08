@@ -41,6 +41,18 @@
       </Content>
     </ItemGroup>
 
+    <!--
+      appsettings.Development.json 里是本机连接串和开发用 JWT 密钥。
+      虽然 ASPNETCORE_ENVIRONMENT=Production 时不会读到它，但文件本身会跟着
+      publish 产物一起进镜像 —— 谁拿到镜像都能翻出来。所以干脆不带它出厂。
+
+      只影响 publish，不影响 dotnet run：后者从项目目录读配置，
+      CopyToOutputDirectory 没动。
+    -->
+    <ItemGroup>
+      <Content Update="appsettings.Development.json" CopyToPublishDirectory="Never" />
+    </ItemGroup>
+
     <ItemGroup>
       <ProjectReference Include="..\TodoSystem.Application\TodoSystem.Application.csproj" />
       <ProjectReference Include="..\TodoSystem.Infrastructure\TodoSystem.Infrastructure.csproj" />

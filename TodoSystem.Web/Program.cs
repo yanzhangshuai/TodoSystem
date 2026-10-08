@@ -7,8 +7,10 @@ using Scalar.AspNetCore;
 using TodoSystem.Domain.Constants;
 using TodoSystem.Domain.Entities;
 using TodoSystem.EntityFrameworkCore;
+using TodoSystem.Infrastructure.Email;
 using TodoSystem.Web.Utils.ApiResults;
 using TodoSystem.Web.Utils.Auth;
+using TodoSystem.Web.Utils.Configuration;
 using TodoSystem.Web.Utils.DependencyInjection;
 using TodoSystem.Web.Utils.Email;
 using TodoSystem.Web.Utils.Exceptions;
@@ -17,6 +19,11 @@ using TodoSystem.Web.Utils.Logging;
 using TodoSystem.Web.Utils.Route;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// 配置体检放在最前面 —— 必须在任何 DI 注册、任何 IOptions 绑定之前。
+// 排在后面的话，DI 阶段先抛出的异常会把真正的原因盖掉（比如那句
+// 「未配置数据库连接字符串」会先炸，后面「JWT 密钥也没配」就看不到了）。
+builder.ValidateRequiredConfiguration();
 
 builder.AddLoggerProvider();
 
@@ -67,6 +74,18 @@ var app = builder.Build();
 
 app.UseExceptionHandler()
     .UseCustomAuth();
+
+// 非开发环境用 File 投递：邮件只写文件，不会真的寄出。
+// 不拦下来（演示 / 内网是合法用法），但必须留下痕迹 ——
+// 否则就成了「以为在发信，其实一封都没发出去」，要等第一个用户注册才暴露。
+if (!app.Environment.IsDevelopment()
+    && string.Equals(builder.Configuration["Email:Provider"], EmailProviders.File,
+        StringComparison.OrdinalIgnoreCase))
+{
+    app.Logger.LogWarning(
+        "Email:Provider = File（环境 {Environment}）：邮件只落盘、不会真的寄出。要真发信请改成 Smtp 并配好 SMTP 凭据。",
+        app.Environment.EnvironmentName);
+}
 
 
 // 空库时写入联调种子账号（ADMIN/USER，密码 123）。

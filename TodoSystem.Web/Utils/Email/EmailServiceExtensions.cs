@@ -12,7 +12,10 @@ public static class EmailServiceExtensions
 
         services.Configure<EmailOptions>(section);
 
-        var provider = section.Get<EmailOptions>()?.Provider ?? EmailProviders.File;
+        // 不给 ?? EmailProviders.File 这样的兜底 —— 那正是「Provider 写错却静默回落
+        // File」那个坑。Provider 有没有配、值认不认识，ValidateRequiredConfiguration()
+        // 已经在启动时拦过；下面那个 else 分支是防御性的第二道。
+        var provider = section.Get<EmailOptions>()?.Provider ?? string.Empty;
 
         if (string.Equals(provider, EmailProviders.File, StringComparison.OrdinalIgnoreCase))
         {
@@ -20,6 +23,9 @@ public static class EmailServiceExtensions
         }
         else if (string.Equals(provider, EmailProviders.Smtp, StringComparison.OrdinalIgnoreCase))
         {
+            // Host / FromAddress 是否为空由 Program.cs 的 ValidateRequiredConfiguration()
+            // 统一校验。放这里的话，「哪些键必填」这件事会散在两处，
+            // 而且它得先知道 Provider 的值才知道该查哪些键，本来就不该分散。
             services.AddScoped<IEmailService, SmtpEmailService>();
         }
         else

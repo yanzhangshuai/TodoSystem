@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
-using TodoSystem.Infrastructure.Exceptions;
 using TodoSystem.Infrastructure.Google;
 using TodoSystem.Infrastructure.Token;
 using TodoSystem.Web.Utils.ApiResults;
@@ -22,11 +21,10 @@ public static class CustomAuthExtensions
         // JWT
         services.Configure<TokenOptions>(configuration.GetSection(TokenOptions.SectionName));
 
-        var jwt = configuration.GetSection(TokenOptions.SectionName).Get<TokenOptions>()
-                  ?? throw new CustomException(500, "未配置 JWT");
-
-        if (string.IsNullOrWhiteSpace(jwt.SecretKey) || Encoding.UTF8.GetByteCount(jwt.SecretKey) < 32)
-            throw new CustomException(500, "JWT SecretKey 至少 32 字节");
+        // 这里不再校验 SecretKey 的长度和 Issuer / Audience 是否为空：
+        // Program.cs 开头的 ValidateRequiredConfiguration() 已经统一拦过，
+        // 而且是把所有问题一次报完。两处都写，加新配置项时一定会漏掉一边。
+        var jwt = configuration.GetSection(TokenOptions.SectionName).Get<TokenOptions>()!;
 
         services.AddHttpContextAccessor();
 
